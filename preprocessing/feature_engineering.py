@@ -1,6 +1,7 @@
 # feature_engineering.py
 
 from select_dataset import select_dataset
+from plot_fscore_classif import plot_selectkbest_scores
 
 import pandas as pd
 import numpy as np
@@ -132,7 +133,7 @@ def select_features_univariate(X, y, k=10, score_func=f_classif):
     print("\nFeature Scores:")
     print(scores.head(k))
     
-    return selected_features
+    return selected_features, scores
 
 def select_features_rfe(X, y, estimator=None, n_features_to_select=10):
     """
@@ -166,6 +167,30 @@ def select_features_rfe(X, y, estimator=None, n_features_to_select=10):
 
     return selected_features
 
+def plot_fscore_classif(initial_k=60, step=5, top_n=30):
+    """
+    Plots the F-Sccore classification for different values of k using SelectKBest.
+    Args:
+        initial_k (int): Initial number of features to select.
+        step (int): Step size for decreasing k.
+    """
+
+    k = initial_k
+    selected_features_list = []
+    for _ in range(9):
+        selected_features_f_classif, scores = select_features_univariate(X, y, k=k, score_func=f_classif)
+        selected_features_list.append(scores)
+        print(f"\n{k}-Features selected by F-classif: {selected_features_f_classif}")
+        k -= step
+    
+    print("\n--- Plotting Top 30 Features based on 'Score' from the first DataFrame ---")
+    plot_selectkbest_scores(selected_features_list, top_n_features=top_n, dataframe_index_to_plot=0)
+
+    print("\n--- Plotting Top 30 Features based on 'Score' from the second DataFrame ---")
+    plot_selectkbest_scores(selected_features_list, top_n_features=top_n, dataframe_index_to_plot=1)
+
+    print("\n--- Plotting Top 20 Features based on 'Score' from the last DataFrame ---")
+    plot_selectkbest_scores(selected_features_list, top_n_features=top_n if top_n>k else k, dataframe_index_to_plot=-1)
 
 if __name__ == "__main__":
     # Example Usage:
@@ -192,18 +217,24 @@ if __name__ == "__main__":
     print(y.head())
 
     # Step 3: Perform Correlation Analysis
-    print("\n--- Performing Correlation Analysis ---")
-    correlation_matrix = perform_correlation_analysis(df_scaled.copy(), target_column='Label', plot=True)
+    # print("\n--- Performing Correlation Analysis ---")
+    # correlation_matrix = perform_correlation_analysis(df_scaled.copy(), target_column='Label', plot=True)
 
     # Step 4: Feature Selection using SelectKBest (ANOVA F-value)
-    selected_features_f_classif = select_features_univariate(X, y, k=5, score_func=f_classif)
-    print(f"\nFeatures selected by F-classif: {selected_features_f_classif}")
+    # selected_features_f_classif, _ = select_features_univariate(X, y, k=40, score_func=f_classif)
+    # print(f"\nFeatures selected by F-classif: {selected_features_f_classif}")
 
-    # Step 5: Feature Selection using SelectKBest (Mutual Information)
-    selected_features_mutual_info = select_features_univariate(X, y, k=5, score_func=mutual_info_classif)
-    print(f"\nFeatures selected by Mutual Information: {selected_features_mutual_info}")
+    # # Step 5: Feature Selection using SelectKBest (Mutual Information)
+    # selected_features_mutual_info, _ = select_features_univariate(X, y, k=5, score_func=mutual_info_classif)
+    # print(f"\nFeatures selected by Mutual Information: {selected_features_mutual_info}")
 
     # Step 6: Feature Selection using Recursive Feature Elimination (RFE)
     # Note: RFE requires a classifier that provides feature importances (e.g., RandomForestClassifier)
-    selected_features_rfe = select_features_rfe(X, y, n_features_to_select=5)
-    print(f"\nFeatures selected by RFE: {selected_features_rfe}")
+    # selected_features_rfe = select_features_rfe(X, y, n_features_to_select=5)
+    # print(f"\nFeatures selected by RFE: {selected_features_rfe}")
+
+    # Generating multiple feature selection results for preliminary selection
+    #   comment out if not wanted
+    plot_fscore_classif(initial_k=60, step=5, top_n=30)
+
+

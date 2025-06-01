@@ -167,38 +167,45 @@ def select_features_rfe(X, y, estimator=None, n_features_to_select=10):
 
     return selected_features
 
-def plot_fscore_classif(initial_k=60, step=5, top_n=30):
+def get_fscore_classif(X, y, initial_k=60, step=5, top_n=30, plot=True):
     """
-    Plots the F-Sccore classification for different values of k using SelectKBest.
+    Gets the F-Sccore classification for different values of k using SelectKBest.
     Args:
         initial_k (int): Initial number of features to select.
         step (int): Step size for decreasing k.
+    Returns:
+        The list of top 10 features selected at last value for k (adjust params for specific
+        values of k if desired).
     """
 
     k = initial_k
-    selected_features_list = []
+    selected_features_scores, selected_features_list = [], []
     for _ in range(9):
         selected_features_f_classif, scores = select_features_univariate(X, y, k=k, score_func=f_classif)
-        selected_features_list.append(scores)
+        selected_features_scores.append(scores)
+        selected_features_list.append(selected_features_f_classif)
         print(f"\n{k}-Features selected by F-classif: {selected_features_f_classif}")
         k -= step
-    
-    print("\n--- Plotting Top 30 Features based on 'Score' from the first DataFrame ---")
-    plot_selectkbest_scores(selected_features_list, top_n_features=top_n, dataframe_index_to_plot=0)
 
-    print("\n--- Plotting Top 30 Features based on 'Score' from the second DataFrame ---")
-    plot_selectkbest_scores(selected_features_list, top_n_features=top_n, dataframe_index_to_plot=1)
+    if plot:    
+        print("\n--- Plotting Top 30 Features based on 'Score' from the first DataFrame ---")
+        plot_selectkbest_scores(selected_features_scores, top_n_features=top_n, dataframe_index_to_plot=0)
 
-    print("\n--- Plotting Top 20 Features based on 'Score' from the last DataFrame ---")
-    plot_selectkbest_scores(selected_features_list, top_n_features=top_n if top_n>k else k, dataframe_index_to_plot=-1)
+        print("\n--- Plotting Top 30 Features based on 'Score' from the second DataFrame ---")
+        plot_selectkbest_scores(selected_features_scores, top_n_features=top_n, dataframe_index_to_plot=1)
+
+        print("\n--- Plotting Top 20 Features based on 'Score' from the last DataFrame ---")
+        plot_selectkbest_scores(selected_features_scores, top_n_features=top_n if top_n>k else k, dataframe_index_to_plot=-1)
+
+    return selected_features_list[-1]
 
 if __name__ == "__main__":
     # Example Usage:
     
     df = select_dataset(attack_filter='DDoS', data_path='./data/Portscan-DDos-Botnet-Friday.parquet')
     
-    print("Original Dummy DataFrame shape:", df.shape)
-    print("\nOriginal Dummy DataFrame Info:")
+    print("DataFrame shape:", df.shape)
+    print("\nDataFrame Info:")
     df.info()
 
     # Step 1: Encode categorical features
@@ -235,6 +242,7 @@ if __name__ == "__main__":
 
     # Generating multiple feature selection results for preliminary selection
     #   comment out if not wanted
-    plot_fscore_classif(initial_k=60, step=5, top_n=30)
+    selected_features = get_fscore_classif(X, y, initial_k=60, step=5, top_n=30, plot=True)
+    print(f"Selecting Features: \n{selected_features[:10]}")
 
 

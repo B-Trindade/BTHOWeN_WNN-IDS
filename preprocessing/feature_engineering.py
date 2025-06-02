@@ -1,7 +1,7 @@
 # feature_engineering.py
 
-from select_dataset import select_dataset
-from plot_fscore_classif import plot_selectkbest_scores
+from preprocessing.select_dataset import select_dataset
+from preprocessing.plot_fscore_classif import plot_selectkbest_scores
 
 import pandas as pd
 import numpy as np

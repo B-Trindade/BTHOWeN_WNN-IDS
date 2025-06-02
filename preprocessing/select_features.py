@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from feature_engineering import get_fscore_classif, select_dataset, encode_categorical_features, scale_numerical_features
+from preprocessing.feature_engineering import get_fscore_classif, select_dataset, encode_categorical_features, scale_numerical_features
 
 def select_data(dataset:str = "DDoS", path:str = "./data/Portscan-DDos-Botnet-Friday.parquet"):
     """
@@ -37,8 +37,7 @@ def select_data(dataset:str = "DDoS", path:str = "./data/Portscan-DDos-Botnet-Fr
     print(y.head())
 
     top_features = get_fscore_classif(X=X, y=y, initial_k=60, step=5, top_n=30, plot=False)
-    df_selected = df_scaled[top_features]
-    X = df_selected.drop(columns=['Label'])
-    y = df_selected['Label']
+    #! Selects the top 10 features, FIXME for variable top k
+    X = X[top_features[:10]] 
 
     return X, y

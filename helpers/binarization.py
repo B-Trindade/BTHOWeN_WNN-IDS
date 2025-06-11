@@ -9,7 +9,7 @@ def thermometer_encode(data, num_bins, feature_ranges):
     Applies thermometer encoding to numerical data.
 
     Args:
-        data (np.ndarray): Numerical input data (features).
+        data (pd.core.frame.DataFrame): Numerical input data (features).
                            Shape: (n_samples, n_features).
         num_bins (int): The number of bins (bits) to use for encoding each feature.
         feature_ranges (dict): A dictionary where keys are feature indices and values are
@@ -37,7 +37,7 @@ def thermometer_encode(data, num_bins, feature_ranges):
             bin_width = (max_val - min_val) / num_bins
             
             for j in range(n_samples):
-                val = data[j, i]
+                val = data.iloc[j, i]
                 
                 # Determine which bin the value falls into
                 # Clip value to ensure it's within the defined range

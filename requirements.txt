@@ -12,3 +12,4 @@ seaborn
 psutil
 resource
 pyarrow
+git+https://github.com/IAZero/wisardpkg.git@develop

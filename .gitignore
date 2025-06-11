@@ -9,6 +9,10 @@ __pycache__/
 # Data files
 data/
 
+# Experimentational Files
+lab.py
+test.py
+
 # Distribution / packaging
 .Python
 build/
